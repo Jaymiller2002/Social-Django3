@@ -35,17 +35,19 @@ def get_images(request):
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def update_image(request, pk):
-    print("REQUEST, PK: ", request, pk)
+    print("REQUEST: ", request)
     try:
         image = Image.objects.get(pk=pk)
     except Image.DoesNotExist:
-        return Response(status=status.HTTP_404_NOT_FOUND)
+        return Response({"error": "Image not found."}, status=status.HTTP_404_NOT_FOUND)
 
     image_serialized = ImageSerializer(image, data=request.data)
+    print("IMAGE SERIALIZER: ", ImageSerializer)
     if image_serialized.is_valid():
-        image_serialized.save()
-        return Response(image_serialized.data)
-    return Response(image_serialized.errors, status=status.HTTP_400_BAD_REQUEST)
+        updated_image = image_serialized.save()
+        return Response({"message": "Image updated successfully.", "data": ImageSerializer(imageId).data})
+        print("IMAGE SERIALIZER IMAGEID DATA: ", ImageSerializer(imageid).data)
+    return Response({"error": "Invalid data provided.", "details": image_serialized.errors}, status=status.HTTP_400_BAD_REQUEST)
 
 # @api_view(['DELETE'])
 # @permission_classes([IsAuthenticated])
